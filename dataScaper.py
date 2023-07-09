@@ -1,49 +1,100 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 from datetime import datetime
-plt.style.use('seaborn')
+# plt.style.use('seaborn')
 
 import yfinance as yf
-# Alpha vantage code PMC13EMV4SJG0S3D
 
-#Get all the stocks in variables
-evgrf= yf.Ticker('evgrf')
-aapl = yf.Ticker('aapl')
-msft = yf.Ticker('msft')
-nttyy = yf.Ticker('nttyy')
-goog = yf.Ticker('goog')
+from flask import Flask, render_template
 
-#Store all stocks into an array
-stocks = [evgrf, aapl, msft, nttyy, goog]
+app = Flask(__name__)
 
-#Print out the data of each to test
-# for stock in stocks:
-#     print(stock.info)
+@app.route('/stocks')
+def home():
 
-# pe_ratio, pb_ratio
-for stock in stocks:
-    stock_symbol = stock.ticker
+    #ACCESSING INDIVIDUAL STOCKS (Currently this is the top 25 in the S%P 500)
+    aapl = yf.Ticker('aapl')
+    msft = yf.Ticker('msft')
+    amzn = yf.Ticker('amzn')
+    nvda = yf.Ticker('nvda')
+    tsla = yf.Ticker('tsla')
+    googl = yf.Ticker('googl')
+    meta = yf.Ticker('meta')
+    goog = yf.Ticker('goog')
+    # brkb = yf.Ticker('brk-b')
+    unh = yf.Ticker('unh')
+    jnj = yf.Ticker('jnj')
+    jpm = yf.Ticker('jpm')
+    xom = yf.Ticker('xom')
+    v = yf.Ticker('v')
+    lly = yf.Ticker('lly')
+    pg = yf.Ticker('pg')
+    avgo = yf.Ticker('avgo')
+    ma = yf.Ticker('ma')
+    hd = yf.Ticker('hd')
+    mrk = yf.Ticker('mrk')
+    cvx = yf.Ticker('cvx')
+    pep = yf.Ticker('pep')
+    abbv = yf.Ticker('abbv')
+    cost = yf.Ticker('cost')
+    ko = yf.Ticker('ko')
 
-    #Price / Earnings Ratio
-    pe_ratio = stock.info.get('trailingPE', 'N/A')
-    print(f"{stock_symbol}: P/E ratio - {pe_ratio}")
+    # ACCESSING ALL STOCKS IN S&P
+    # sp500_tickers = yf.tickers_sp500()
 
-    # Price / Book ratio, 0.95-1.1 is normal, 0.5 and below is considered very good
-    pb_ratio = stock.info.get('priceToBook', 'N/A')
-    print(f"{stock_symbol}: P/B ratio - {pb_ratio}")
+    # Store all stocks into a dictionary with their symbols as keys
+    stocks = {
+        'aapl': aapl,
+        'msft': msft,
+        'amzn': amzn,
+        'nvda': nvda,
+        'tsla': tsla,
+        'googl': googl,
+        'meta': meta,
+        'goog': goog,
+        'brk-b': brkb, 
+        'unh': unh,
+        'jnj': jnj,
+        'jpm': jpm,
+        'xom': xom,
+        'v': v,
+        'lly': lly,
+        'pg': pg,
+        'avgo': avgo,
+        'ma': ma,
+        'hd': hd,
+        'mrk': mrk,
+        'cvx': cvx,
+        'pep': pep,
+        'abbv': abbv,
+        'cost': cost,
+        'ko': ko
+    }
 
-    # Debt-To-Equity ratio
-    # total_debt = stock.info.get('totalDebt')
-    # total_equity = stock.info.get('totalStockholderEquity')
-    # debt_to_equity_ratio = 'N/A'
-    # if total_debt and total_equity:
-    #     debt_to_equity_ratio = total_debt / total_equity
-    # print(f"{stock_symbol}: Debt-To-Equity ratio - {debt_to_equity_ratio}")
-    
-    # Free cash flow
+    # Create an empty dictionary to store the stock data
+    # stock_data = {}
+    metrics_df = pd.DataFrame(columns=['Ticker', 'P/E Ratio', 'P/B Ratio'])
 
-    #
-print("hello")
+    # Iterate over each ticker in the S&P 500
+    for ticker in stocks:
+        # Retrieve the stock data using the ticker symbol
+        stock = yf.Ticker(ticker)
+        
+        # Retrieve the desired metrics
+        pe_ratio = stock.info.get('trailingPE', 'N/A')
+        pb_ratio = stock.info.get('priceToBook', 'N/A')
+        
+        # Append the metrics to the DataFrame
+        stock_df = pd.DataFrame({
+            'Ticker': ticker,
+            'P/E Ratio': pe_ratio,
+            'P/B Ratio': pb_ratio
+        }, index=[0])
+        metrics_df = pd.concat([metrics_df, stock_df], ignore_index=True)
 
 
 
+    return render_template('index.html', stock_data=metrics_df)
+
+if __name__ == '__main__':
+    app.run(debug=True, port = 8000)
