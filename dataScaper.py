@@ -37,11 +37,18 @@ def main():
     # ticker_symbol = '^GSPC'
     ticker_symbol = 'VFV.TO'
 
-    # Retrieve historical price data using yfinance
+    # To represent how tech is doing
+    tech_symbol = 'XLK'
+
+
+    # Retrieve historical price data of the stock and sectors we are analysing using yfinance
     data = yf.download(ticker_symbol, start='2000-01-01')
-    # metrics_df = pd.DataFrame(columns=['Ticker', 'P/E Ratio', 'P/B Ratio'])
+    tech_data = yf.download(tech_symbol, start='2000-01-01')
+
     # Create an empty DataFrame to store the metrics
     metrics_df = pd.DataFrame(columns=['Ticker', 'Date', 'Open', 'High', 'Low', 'Close', 'Volume'])
+    tech_metrics_df = pd.DataFrame(columns=['Ticker', 'Open', 'Close'])
+
 
     # Populate the metrics DataFrame with historical price data
     metrics_df = pd.concat([metrics_df, pd.DataFrame({
@@ -54,13 +61,25 @@ def main():
         'Volume': data['Volume'].values
     })])
 
+    tech_metrics_df = pd.concat([tech_metrics_df, pd.DataFrame({
+        'Ticker': [ticker_symbol]*len(tech_data), 
+        'Open': tech_data['Open'].values,
+        'Close': tech_data['Close'].values
+    })])
+
     # plt.plot(data.index, data['Close'])
 
     # Close price of the following day  (for backtesting)
     metrics_df['Tomorrow'] = metrics_df['Close'].shift(-1)
+    tech_metrics_df['NextWeek'] = tech_metrics_df['Close'].shift(-5)
+    #tech_metrics_df['NextMonth'] = tech_metrics_df['Close'].shift(-23)
 
     #to determine if tomorrow's price (close) is greater than todays(close), (for backtesting)
     metrics_df['1DayIncrease'] = metrics_df['Tomorrow'] > metrics_df['Close']
+    #add in sector columns
+    metrics_df['TechIncreaseWeek'] = tech_metrics_df['NextWeek'] > tech_metrics_df['Close']
+    
+   # metrics_df['TechIncreaseMonth'] = tech_metrics_df['NextMonth'] > tech_metrics_df['Close']
 
     # Close price for the following week (5 business days away)
     metrics_df['NextWeek'] = metrics_df['Close'].shift(-5)
@@ -77,7 +96,7 @@ def main():
     # train = metrics_df.iloc[:-100]
     # test = metrics_df.iloc[-100:]
 
-    predictors = ["Close", "Volume", "Open", "High", "Low"]
+    predictors = ["Close", "Volume", "Open", "High", "Low", "TechIncreaseWeek"]
 
     #Back test the model
     predictions = backtest(metrics_df, DayModel, predictors)
@@ -90,18 +109,7 @@ def main():
 
 if __name__ == "__main__":
     main()
-    # DayModel.fit(train[predictors], train["1DayIncrease"])
-    # WeekModel.fit(train[predictors], train["1WeekIncrease"])
-
-    # # Generate predictions and turn them in to a pandas series instead of a numpy array
-    # predsDay = DayModel.predict(test[predictors])
-    # predsWeek = WeekModel.predict(test[predictors])
-    # predsDay = pd.Series(predsDay, index=test.index)
-    # predsWeek = pd.Series(predsWeek, index=test.index)
-
-    # scoreDay = precision_score(test["1DayIncrease"], predsDay)
-    # scoreWeek = precision_score(test["1WeekIncrease"], predsWeek)
-    # # print(score)
+ 
     # x = {'stock_data': scoreDay}
     # y = {'stock_data': scoreWeek}
 
@@ -115,6 +123,4 @@ if __name__ == "__main__":
     #return render_template('index.html', stock_data=metrics_df)
     # return render_template('index2.html', x=x)
 
-    # if __name__ == '__main__':
-    #     app.run(debug=True)
 
