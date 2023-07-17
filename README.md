@@ -10,7 +10,7 @@ Web scraper that takes in 50 'blue chip' stocks and evaluates their metrics to f
 - [x] Use machine learning to make stock price predictions
 - [x] Back Test the algorithm
 - [ ] Add in sectors going up or down over the same time period ( and see if precision improves )
-- [ ] Tech sector
+- [x] Tech sector
 - [ ] Energy sector
 - [ ] Financials sector
 - [ ] Industrial sector
