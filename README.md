@@ -11,7 +11,7 @@ Web scraper that takes in 50 'blue chip' stocks and evaluates their metrics to f
 - [x] Back Test the algorithm
 - [ ] Add in sectors going up or down over the same time period ( and see if precision improves )
 - [x] Tech sector
-- [ ] Energy sector
+- [x] Energy sector
 - [ ] Financials sector
 - [ ] Industrial sector
 - [ ] Real Estate sector
