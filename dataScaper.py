@@ -8,8 +8,8 @@ from sklearn.metrics import precision_score
 
 import yfinance as yf
 
-# from flask import Flask, render_template
-# app = Flask(__name__)
+from flask import Flask, render_template
+app = Flask(__name__)
 # @app.route('/stocks')
 # def home():
 
@@ -49,10 +49,11 @@ def backtestWeek(data, model, predictors, start=2500, step=250):
     
     return pd.concat(all_predictions)
 
-def main():
+@app.route('/stocks')
+def home():
     # Define the ticker symbol for the stock/fund to look at
     # S&P
-    # ticker_symbol = '^GSPC'
+    ticker_symbol = '^GSPC'
     ticker_symbol = 'VFV.TO'
 
     # To represent how sectors are doing (we will just look at the price)
@@ -185,23 +186,15 @@ def main():
     DayPrecision = precision_score(DayPredictions["1DayIncrease"], DayPredictions["Predictions"])
     WeekPrecision = precision_score(WeekPredictions["1WeekIncrease"], WeekPredictions["Predictions"])
 
-    print(DayPrecision)
-    print(WeekPrecision)
+    # Prepare the data to pass to the template
+    context = {
+        'day_precision': DayPrecision,
+        'week_precision': WeekPrecision,
+    }
+
+    return render_template('index.html', **context)
 
 if __name__ == "__main__":
-    main()
- 
-    # x = {'stock_data': scoreDay}
-    # y = {'stock_data': scoreWeek}
-
-    # #use pandas library to round entire table to two decimals
-    # metrics_df = metrics_df.round(2)
-
-    # print('here are the precison scores for day and week')
-    # print(x)
-    # print(y)
-
-    #return render_template('index.html', stock_data=metrics_df)
-    # return render_template('index2.html', x=x)
+    app.run()
 
 
