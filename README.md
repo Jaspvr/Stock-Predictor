@@ -9,12 +9,12 @@ Web scraper that takes in 50 'blue chip' stocks and evaluates their metrics to f
 - [x] Create simple html file and connect to python with flask
 - [x] Use machine learning to make stock price predictions
 - [x] Back Test the algorithm
-- [ ] Add in sectors going up or down over the same time period ( and see if precision improves )
+- [x] Add in sectors going up or down over the same time period ( and see if precision improves )
+- [x] Add in other sector info that improves precision
 - [x] Tech sector
 - [x] Energy sector
-- [ ] Financials sector
-- [ ] Industrial sector
-- [ ] Real Estate sector
-- [ ] Add more metrics for machine learning to base price predictions from
+- [x] Financials sector
+- [x] Industrial sector
+- [x] Real Estate sector
 - [ ] Create React front end
 - [ ] Connect React to Python
