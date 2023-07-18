@@ -16,5 +16,6 @@ Web scraper that takes in 50 'blue chip' stocks and evaluates their metrics to f
 - [x] Financials sector
 - [x] Industrial sector
 - [x] Real Estate sector
+- [ ] Create simple html frontend to verify flask app is working as expected
 - [ ] Create React front end
 - [ ] Connect React to Python
