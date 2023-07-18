@@ -13,20 +13,38 @@ import yfinance as yf
 # @app.route('/stocks')
 # def home():
 
-def predict(train, test, predictors, DayModel):
+def predictDay(train, test, predictors, DayModel):
     DayModel.fit(train[predictors], train["1DayIncrease"])
     predsDay = DayModel.predict(test[predictors])
     predsDay = pd.Series(predsDay, index=test.index, name="Predictions")
     combined = pd.concat([test["1DayIncrease"], predsDay], axis=1)
     return combined
 
-def backtest(data, model, predictors, start=2500, step=250):
+def backtestDay(data, model, predictors, start=2500, step=250):
     all_predictions = []
 
     for i in range(start, data.shape[0], step):
         train = data.iloc[0:i].copy()
         test = data.iloc[i:(i+step)].copy()
-        predictions = predict(train, test, predictors, model)
+        predictions = predictDay(train, test, predictors, model)
+        all_predictions.append(predictions)
+    
+    return pd.concat(all_predictions)
+
+def predictWeek(train, test, predictors, WeekModel):
+    WeekModel.fit(train[predictors], train["1WeekIncrease"])
+    predsDay = WeekModel.predict(test[predictors])
+    predsDay = pd.Series(predsDay, index=test.index, name="Predictions")
+    combined = pd.concat([test["1WeekIncrease"], predsDay], axis=1)
+    return combined
+
+def backtestWeek(data, model, predictors, start=2500, step=250):
+    all_predictions = []
+
+    for i in range(start, data.shape[0], step):
+        train = data.iloc[0:i].copy()
+        test = data.iloc[i:(i+step)].copy()
+        predictions = predictWeek(train, test, predictors, model)
         all_predictions.append(predictions)
     
     return pd.concat(all_predictions)
@@ -40,6 +58,9 @@ def main():
     # To represent how sectors are doing (we will just look at the price)
     tech_symbol = 'XLK'
     energy_symbol = 'XLE'
+    financial_symbol = 'XLF'
+    industrial_symbol = 'XLI'
+    real_estate_symbol = 'VNQ'
 
 
     # Retrieve historical price data of the stock and sectors we are analysing using yfinance
@@ -47,6 +68,9 @@ def main():
     data = yf.download(ticker_symbol, start_of_data)
     tech_data = yf.download(tech_symbol, start_of_data)
     energy_data = yf.download(energy_symbol, start_of_data)
+    financial_data = yf.download(financial_symbol, start_of_data)
+    industrial_data = yf.download(industrial_symbol, start_of_data)
+    real_estate_data = yf.download(real_estate_symbol, start_of_data)
 
 
     # Create an empty DataFrame to store the metrics
@@ -54,6 +78,9 @@ def main():
     # Same but for the sectors
     tech_metrics_df = pd.DataFrame(columns=['Ticker', 'Open', 'Close', 'Volume'])
     energy_metrics_df = pd.DataFrame(columns=['Open', 'Close', 'Volume'])
+    financial_metrics_df = pd.DataFrame(columns=['Open', 'Close', 'Volume'])
+    industrial_metrics_df = pd.DataFrame(columns=['Open', 'Close', 'Volume'])
+    real_estate_metrics_df = pd.DataFrame(columns=['Open', 'Close', 'Volume'])
 
 
 
@@ -81,6 +108,24 @@ def main():
         'Volume': energy_data['Volume'].values
     })])
 
+    financial_metrics_df = pd.concat([financial_metrics_df, pd.DataFrame({
+        'Open': financial_data['Open'].values,
+        'Close': financial_data['Close'].values,
+        'Volume': financial_data['Volume'].values
+    })])
+
+    industrial_metrics_df = pd.concat([industrial_metrics_df, pd.DataFrame({
+        'Open': industrial_data['Open'].values,
+        'Close': industrial_data['Close'].values,
+        'Volume': industrial_data['Volume'].values
+    })])
+
+    real_estate_metrics_df = pd.concat([real_estate_metrics_df, pd.DataFrame({
+        'Open': real_estate_data['Open'].values,
+        'Close': real_estate_data['Close'].values,
+        'Volume': real_estate_data['Volume'].values
+    })])
+
     # plt.plot(data.index, data['Close'])
 
     # Close price of the following day  (for backtesting)
@@ -88,6 +133,10 @@ def main():
     # Prices for sectors
     tech_metrics_df['NextWeek'] = tech_metrics_df['Close'].shift(-5)
     energy_metrics_df['NextWeek'] = energy_metrics_df['Close'].shift(-5)
+    financial_metrics_df['NextWeek'] = financial_metrics_df['Close'].shift(-5)
+    financial_metrics_df['TwoWeek'] = financial_metrics_df['Close'].shift(-10)
+    industrial_metrics_df['NextWeek'] = industrial_metrics_df['Close'].shift(-5)
+    real_estate_metrics_df['NextWeek'] = industrial_metrics_df['Close'].shift(-5)
     #tech_metrics_df['NextMonth'] = tech_metrics_df['Close'].shift(-23)
 
 
@@ -98,8 +147,14 @@ def main():
     metrics_df['TechVolume'] = tech_metrics_df['Volume']
     metrics_df['EnergyIncreaseWeek'] = energy_metrics_df['NextWeek'] > energy_metrics_df['Close']
     metrics_df['EnergyVolume'] = energy_metrics_df['Volume']
-
-   # metrics_df['TechIncreaseMonth'] = tech_metrics_df['NextMonth'] > tech_metrics_df['Close']
+    metrics_df['FinancialIncreaseWeek'] = financial_metrics_df['NextWeek'] > financial_metrics_df['Close']
+    metrics_df['FinancialVolume'] = financial_metrics_df['Volume']
+    metrics_df['IndustrialIncreaseWeek'] = industrial_metrics_df['NextWeek'] > industrial_metrics_df['Close']
+    metrics_df['IndustrialVolume'] = industrial_metrics_df['Volume']
+    metrics_df['RealEstateIncreaseWeek'] = real_estate_metrics_df['NextWeek'] > real_estate_metrics_df['Close']
+    metrics_df['RealEstateVolume'] = real_estate_metrics_df['Volume']
+    #metrics_df['TechIncreaseMonth'] = tech_metrics_df['NextMonth'] > tech_metrics_df['Close']
+    # metrics_df['FinancialIncrease2Weeks'] = financial_metrics_df['TwoWeek'] > financial_metrics_df['Close']
 
     # Close price for the following week (5 business days away)
     metrics_df['NextWeek'] = metrics_df['Close'].shift(-5)
@@ -116,16 +171,22 @@ def main():
     # train = metrics_df.iloc[:-100]
     # test = metrics_df.iloc[-100:]
 
-    predictors = ["Close", "Volume", "Open", "High", "Low", "TechIncreaseWeek", "TechVolume", "EnergyIncreaseWeek", "EnergyVolume"]
+    predictors = ["Close", "Volume", "Open", "High", "Low", "TechIncreaseWeek", "TechVolume", "EnergyIncreaseWeek", "EnergyVolume", "FinancialIncreaseWeek", "FinancialVolume", "IndustrialVolume", "RealEstateVolume"]
 
-    #Back test the model
-    predictions = backtest(metrics_df, DayModel, predictors)
+    #Back test the models
+    DayPredictions = backtestDay(metrics_df, DayModel, predictors)
+    WeekPredictions = backtestWeek(metrics_df, WeekModel, predictors)
+
     #Predictions was added in to the metrics_df table, now use count to analyse
-    predictions["Predictions"].value_counts()
-    # DayPrediction = predict(train, test, predictors, DayModel)
-    precision = precision_score(predictions["1DayIncrease"], predictions["Predictions"])
+    DayPredictions["Predictions"].value_counts()
+    WeekPredictions["Predictions"].value_counts()
 
-    print(precision)
+    # DayPrediction = predict(train, test, predictors, DayModel)
+    DayPrecision = precision_score(DayPredictions["1DayIncrease"], DayPredictions["Predictions"])
+    WeekPrecision = precision_score(WeekPredictions["1WeekIncrease"], WeekPredictions["Predictions"])
+
+    print(DayPrecision)
+    print(WeekPrecision)
 
 if __name__ == "__main__":
     main()
