@@ -7,19 +7,8 @@
 </head>
 <body>
     <h1>Stock Data</h1>
-<table>
-    <tr>
-        <th>Stock Symbol</th>
-        <th>P/E Ratio</th>
-        <th>P/B Ratio</th>
-    </tr>
-    {% for symbol, data in stock_data.items() %}
-    <tr>
-        <td>{{ symbol }}</td>
-        <td>{{ data.pe_ratio }}</td>
-        <td>{{ data.pb_ratio }}</td>
-    </tr>
-    {% endfor %}
-</table> 
+    <p>Day Precision: {{ day_precision }}</p>
+    <p>Week Precision: {{ week_precision }}</p>
+
 </body>
 </html>
