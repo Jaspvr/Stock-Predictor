@@ -53,7 +53,7 @@ def backtestWeek(data, model, predictors, start=2500, step=250):
 def home():
     # Define the ticker symbol for the stock/fund to look at
     # S&P
-    ticker_symbol = '^GSPC'
+    # ticker_symbol = '^GSPC'
     ticker_symbol = 'VFV.TO'
 
     # To represent how sectors are doing (we will just look at the price)
