@@ -1,5 +1,6 @@
 import pandas as pd
 import matplotlib.pyplot as plt
+import requests
 from datetime import datetime
 
 # For Machine Learning:
@@ -8,8 +9,13 @@ from sklearn.metrics import precision_score
 
 import yfinance as yf
 
-from flask import Flask, render_template
+#from flask import Flask, render_template
+
+from flask import Flask, request, jsonify
+from flask_cors import CORS
 app = Flask(__name__)
+CORS(app, resources={r"/stocks": {"origins": "*"}})
+
 # @app.route('/stocks')
 # def home():
 
@@ -49,12 +55,15 @@ def backtestWeek(data, model, predictors, start=2500, step=250):
     
     return pd.concat(all_predictions)
 
-@app.route('/stocks')
+
+@app.route('/stocks', methods=['GET'])
 def home():
     # Define the ticker symbol for the stock/fund to look at
     # S&P
     # ticker_symbol = '^GSPC'
-    ticker_symbol = 'VFV.TO'
+    # ticker_symbol = 'VFV.TO'
+    ticker_symbol = request.args.get('ticker_symbol')
+
 
     # To represent how sectors are doing (we will just look at the price)
     tech_symbol = 'XLK'
@@ -192,7 +201,9 @@ def home():
         'week_precision': WeekPrecision,
     }
 
-    return render_template('index.html', **context)
+    return jsonify(context)
+
+#     return render_template('index.html', **context)
 
 if __name__ == "__main__":
     app.run()
