@@ -1,6 +1,5 @@
 # Machine Learning Stock Predictor Web Application
-Web scraper that takes in 50 'blue chip' stocks and evaluates their metrics to find out if it is a good time to buy
-
+Flask web app with Python and Sklearn backend model that uses metrics of the specified stock, different sectors, and overall market over the past 20 years to predict whether a stock will increase over the next day and week. The Frontend is built in React and allows a user to input a stock ticker, and have the predictions output to the screen. The precision of these predictions is also output to the screen as it is found through backtesting when the user inputs the stock.
 
 # Check list
 - [x] Find somewhere to ~scrape~ access data from 
