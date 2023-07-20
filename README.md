@@ -1,4 +1,4 @@
-# Undervalued-Stock-Finder
+# Machine Learning Stock Predictor Web Application
 Web scraper that takes in 50 'blue chip' stocks and evaluates their metrics to find out if it is a good time to buy
 
 
@@ -16,6 +16,8 @@ Web scraper that takes in 50 'blue chip' stocks and evaluates their metrics to f
 - [x] Financials sector
 - [x] Industrial sector
 - [x] Real Estate sector
-- [ ] Create simple html frontend to verify flask app is working as expected
-- [ ] Create React front end
-- [ ] Connect React to Python
+- [x] Create simple html frontend to verify flask app is working as expected
+- [x] Create simple React front end
+- [x] Connect React to Python
+- [ ] Make the frontend presentable
+- [ ] Host the application
