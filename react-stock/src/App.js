@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import './style.css';
 
 function StringInput() {
   const [inputValue, setInputValue] = useState('');
@@ -26,7 +27,7 @@ function StringInput() {
   };
 
   return (
-    <div>
+    <div className="container">
       <h2>Input the stock ticker as a string</h2>
       <form onSubmit={handleSubmit}>
         <input
@@ -38,7 +39,7 @@ function StringInput() {
         <button type="submit">Submit</button>
       </form>
       {outputValue && (
-        <div>
+        <div className="output-container">
           <p>Day Precision: {outputValue.day_precision}</p>
           <p>Week Precision: {outputValue.week_precision}</p>
         </div>
