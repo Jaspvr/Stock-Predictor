@@ -192,13 +192,20 @@ def home():
     WeekPredictions["Predictions"].value_counts()
 
     # DayPrediction = predict(train, test, predictors, DayModel)
-    DayPrecision = precision_score(DayPredictions["1DayIncrease"], DayPredictions["Predictions"])
-    WeekPrecision = precision_score(WeekPredictions["1WeekIncrease"], WeekPredictions["Predictions"])
+    DayPrecision = precision_score(DayPredictions["1DayIncrease"], DayPredictions["Predictions"]).toString()
+    WeekPrecision = precision_score(WeekPredictions["1WeekIncrease"], WeekPredictions["Predictions"]).toString()
+
+    prediction_message = ""
+    if DayPrecision > 0.5:
+        prediction_message = "The stock will likely go up in one day."
+    else:
+        prediction_message = "The stock will likely not go up in one day."
 
     # Prepare the data to pass to the template
     context = {
         'day_precision': DayPrecision,
         'week_precision': WeekPrecision,
+        'prediction_message': prediction_message,
     }
 
     return jsonify(context)
