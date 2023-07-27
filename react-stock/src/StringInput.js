@@ -5,6 +5,7 @@ import './style.css';
 function StringInput() {
   const [inputValue, setInputValue] = useState('');
   const [outputValue, setOutputValue] = useState(null); // Set initial value to null
+//   const [predictionMessage, setPredictionMessage] = useState('');
 
   const handleChange = (event) => {
     setInputValue(event.target.value);
@@ -19,6 +20,12 @@ function StringInput() {
           ticker_symbol: inputValue,
         },
       });
+
+      // Parse the JSON response into a JavaScript object
+    //   const data = JSON.parse(response.data);
+
+      // Update the state with the prediction message
+    //   setPredictionMessage(response.data.prediction_message);
 
       setOutputValue(response.data); // Use response.data directly
     } catch (error) {
@@ -45,8 +52,10 @@ function StringInput() {
       </div>
       {outputValue && (
         <div className="output-container">
+          <p>Prediction: {outputValue.prediction_message}</p>
           <p>Day Precision: {outputValue.day_precision}</p>
           <p>Week Precision: {outputValue.week_precision}</p>
+
         </div>
       )}
     </div>
