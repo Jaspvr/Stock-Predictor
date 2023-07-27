@@ -29,15 +29,20 @@ function StringInput() {
   return (
     <div className="container">
       <h2>Input the stock ticker as a string</h2>
-      <form onSubmit={handleSubmit}>
+      <div className="input-container">
         <input
+          className="input-box"
           type="text"
           value={inputValue}
           onChange={handleChange}
           placeholder="Enter a ticker symbol"
         />
-        <button type="submit">Submit</button>
-      </form>
+      </div>
+      <div className="button-container">
+        <button className="submit-button" type="submit" onClick={handleSubmit}>
+          Submit
+        </button>
+      </div>
       {outputValue && (
         <div className="output-container">
           <p>Day Precision: {outputValue.day_precision}</p>
