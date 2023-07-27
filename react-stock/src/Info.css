@@ -1,0 +1,9 @@
+.info-box{
+    background-color: lightblue;
+    padding: 20px;
+    width: 300px;
+    margin-top: 20px;
+    margin-left: 10px;
+    border-radius: 10px;
+    font-family: 'Orbitron', sans-serif;
+}

@@ -1,5 +1,24 @@
 .App {
   text-align: center;
+  /* background-color: darkblue; */
+}
+
+body{
+  background-color: #222c41;
+}
+
+.title-box, .info-box, .string-input {
+  margin: 10px;
+}
+
+.string-input {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  text-align: center;
+  
 }
 
 .App-logo {

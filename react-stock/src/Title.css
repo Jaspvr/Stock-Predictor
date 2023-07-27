@@ -1,0 +1,16 @@
+.title-box {
+    background-color: lightgrey;
+    /* margin-top: 5px;
+    margin-left: 10px;
+    margin-right: 10px; */
+    color: black;
+    font-size: 30px;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: bold;
+    text-align: center;
+    padding: 20px;
+    border-radius: 20px;
+    font-weight: bold;
+
+  }
+  
