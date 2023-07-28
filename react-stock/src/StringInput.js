@@ -52,9 +52,11 @@ function StringInput() {
       </div>
       {outputValue && (
         <div className="output-container">
-          <p>Prediction: {outputValue.prediction_message}</p>
+          <p>Day Prediction: {outputValue.prediction_message_day}</p>
+          <p>Week Prediction: {outputValue.prediction_message_week}</p>
           <p>Day Precision: {outputValue.day_precision}</p>
           <p>Week Precision: {outputValue.week_precision}</p>
+          
 
         </div>
       )}
