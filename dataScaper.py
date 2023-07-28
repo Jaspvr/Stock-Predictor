@@ -55,6 +55,11 @@ def backtestWeek(data, model, predictors, start=2500, step=250):
     
     return pd.concat(all_predictions)
 
+def outputtedPredictDay(train, test, predictors, DayModel):
+    DayModel.fit(train[predictors], train["1DayIncrease"])
+    predsDay = DayModel.predict(test[predictors])
+    return predsDay
+
 
 @app.route('/stocks', methods=['GET'])
 def home():
@@ -192,20 +197,50 @@ def home():
     WeekPredictions["Predictions"].value_counts()
 
     # DayPrediction = predict(train, test, predictors, DayModel)
-    DayPrecision = precision_score(DayPredictions["1DayIncrease"], DayPredictions["Predictions"]).toString()
-    WeekPrecision = precision_score(WeekPredictions["1WeekIncrease"], WeekPredictions["Predictions"]).toString()
-
-    prediction_message = ""
-    if DayPrecision > 0.5:
-        prediction_message = "The stock will likely go up in one day."
-    else:
-        prediction_message = "The stock will likely not go up in one day."
+    DayPrecision = precision_score(DayPredictions["1DayIncrease"], DayPredictions["Predictions"])
+    WeekPrecision = precision_score(WeekPredictions["1WeekIncrease"], WeekPredictions["Predictions"])
 
     # Prepare the data to pass to the template
+    DayPrecision = str(DayPrecision)
+    WeekPrecision = str(WeekPrecision)
+
+    #Make predictions based on the models
+
+    # 1 Day Prediction
+    # Remove tomorrow's data from test dataset to ensure no error occurs (tomorrow's price doesn't exist yet), and set data to most current data
+    tomorrow_test_data = metrics_df.iloc[-1][predictors].values.reshape(1, -1)
+    tomorrow_price_prediction = DayModel.predict(tomorrow_test_data)
+    
+
+    next_week_test_data = metrics_df.iloc[-5][predictors].values.reshape(1, -1)
+    next_week_price_prediction = WeekModel.predict(next_week_test_data)
+    # print(next_week_price_prediction)
+    # print(tomorrow_price_prediction)
+    
+    #Prediction messages to client
+    prediction_message_day = ""
+    if tomorrow_price_prediction == True:
+        prediction_message_day = "The stock will likely go up in one trading day."
+    else:
+        prediction_message_day = "The stock will likely not go up in one trading day."
+
+    prediction_message_week = ""
+    if next_week_price_prediction == True:
+        prediction_message_week = "The stock will likely go up in one week (5 trading days)."
+    else:
+        prediction_message_week = "The stock will likely not go up in one week (5 trading days)."
+
+    # Prepare the data to pass to the template
+    DayPrecision = str(DayPrecision)
+    WeekPrecision = str(WeekPrecision)
+
     context = {
         'day_precision': DayPrecision,
         'week_precision': WeekPrecision,
-        'prediction_message': prediction_message,
+        'prediction_message_day': prediction_message_day,
+        'prediction_message_week': prediction_message_week,
+        # 'prediction_message': prediction_message,
+        # 'dp_to_client': dp_to_client,
     }
 
     return jsonify(context)
@@ -214,5 +249,3 @@ def home():
 
 if __name__ == "__main__":
     app.run()
-
-
