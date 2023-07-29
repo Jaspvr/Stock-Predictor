@@ -1,25 +1,32 @@
-.App {
-  text-align: center;
-  /* background-color: darkblue; */
-}
-
 body{
   background-color: #222c41;
+  margin: 0;
+  padding: 0;
 }
 
 .title-box, .info-box, .string-input {
   margin: 10px;
 }
 
-.string-input {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100vh;
-  text-align: center;
-  
+.string-input-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
+
+.string-input {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: lightgrey;
+    color: black;
+    font-size: 24px;
+    font-family: 'Montserrat', sans-serif;
+    padding: 20px;
+    border-radius: 20px;
+    font-weight: bold;
+  }
 
 .App-logo {
   height: 40vmin;
