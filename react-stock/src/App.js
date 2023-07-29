@@ -6,11 +6,15 @@ import './App.css';
 
 function App() {
   return (
-    <div className = "component-container">
+    <div className="app-container">
+    <div className="component-container">
       <TitleBox />
       <InfoBox />
+    </div>
+    <div className="string-input-container">
       <StringInput />
     </div>
+  </div>
   );
 }
 

@@ -4,8 +4,8 @@ import './style.css';
 
 function StringInput() {
   const [inputValue, setInputValue] = useState('');
-  const [outputValue, setOutputValue] = useState(null); // Set initial value to null
-//   const [predictionMessage, setPredictionMessage] = useState('');
+  const [outputValue, setOutputValue] = useState(null);
+  const [errorMessage, setErrorMessage] = useState('');
 
   const handleChange = (event) => {
     setInputValue(event.target.value);
@@ -21,21 +21,23 @@ function StringInput() {
         },
       });
 
-      // Parse the JSON response into a JavaScript object
-    //   const data = JSON.parse(response.data);
-
-      // Update the state with the prediction message
-    //   setPredictionMessage(response.data.prediction_message);
-
-      setOutputValue(response.data); // Use response.data directly
+      // Error handling
+      if (response.data.error) {
+        setErrorMessage(response.data.error);
+        setOutputValue(null); 
+      } else {
+        setOutputValue(response.data);
+        setErrorMessage(''); // clear any previous error messages
+      }
+ 
     } catch (error) {
       console.error(error);
+      setErrorMessage('An error occurred while fetching data. Please check that you entered a valid stock ticker symbol.');
     }
   };
 
   return (
     <div className="container">
-      {/* <h2>Input a stock ticker as a string</h2> */}
       <div className="input-container">
         <input
           className="input-box"
@@ -50,7 +52,8 @@ function StringInput() {
           Make Predictions
         </button>
       </div>
-      {outputValue && (
+      {errorMessage && <p className="error-message">{errorMessage}</p>}
+      {outputValue && !errorMessage && (
         <div className="output-container">
           <p>Day Prediction: {outputValue.prediction_message_day}</p>
           <p>Week Prediction: {outputValue.prediction_message_week}</p>
