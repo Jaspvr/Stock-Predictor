@@ -27,4 +27,4 @@ Flask web app with Python and Sklearn backend model that uses metrics of the spe
 - [x] Make the frontend presentable
 - [ ] Host the application
 - [x] Add error handling message
-- [ ] Add Video Demo
+- [x] Add Video Demo
