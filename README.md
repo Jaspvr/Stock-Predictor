@@ -19,5 +19,7 @@ Flask web app with Python and Sklearn backend model that uses metrics of the spe
 - [x] Create simple React front end
 - [x] Connect React to Python
 - [x] Send all necessary information from Flask to React frontend. App is working as expected at this point
-- [ ] Make the frontend presentable
+- [x] Make the frontend presentable
 - [ ] Host the application
+- [x] Add error handling message
+- [ ] Add Video Demo
