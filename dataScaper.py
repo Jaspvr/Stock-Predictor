@@ -6,18 +6,24 @@ from datetime import datetime
 # For Machine Learning:
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import precision_score
+from sklearn.experimental import enable_hist_gradient_boosting 
+from sklearn.ensemble import HistGradientBoostingClassifier
 
 import yfinance as yf
 
-#from flask import Flask, render_template
 
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 app = Flask(__name__)
 CORS(app, resources={r"/stocks": {"origins": "*"}})
 
-# @app.route('/stocks')
-# def home():
+def is_valid_ticker_symbol(symbol):
+    try:
+        # Check if the stock exists in Yahoo Finance
+        stock = yf.Ticker(symbol)
+        return True
+    except:
+        return False
 
 def predictDay(train, test, predictors, DayModel):
     DayModel.fit(train[predictors], train["1DayIncrease"])
@@ -69,6 +75,9 @@ def home():
     # ticker_symbol = 'VFV.TO'
     ticker_symbol = request.args.get('ticker_symbol')
 
+    if not ticker_symbol or not is_valid_ticker_symbol(ticker_symbol):
+        error_message = "Invalid stock ticker symbol."
+        return jsonify({"error": error_message})
 
     # To represent how sectors are doing (we will just look at the price)
     tech_symbol = 'XLK'
@@ -76,7 +85,6 @@ def home():
     financial_symbol = 'XLF'
     industrial_symbol = 'XLI'
     real_estate_symbol = 'VNQ'
-
 
     # Retrieve historical price data of the stock and sectors we are analysing using yfinance
     start_of_data = '2000-01-01'
@@ -87,7 +95,6 @@ def home():
     industrial_data = yf.download(industrial_symbol, start_of_data)
     real_estate_data = yf.download(real_estate_symbol, start_of_data)
 
-
     # Create an empty DataFrame to store the metrics
     metrics_df = pd.DataFrame(columns=['Ticker', 'Date', 'Open', 'High', 'Low', 'Close', 'Volume'])
     # Same but for the sectors
@@ -96,8 +103,6 @@ def home():
     financial_metrics_df = pd.DataFrame(columns=['Open', 'Close', 'Volume'])
     industrial_metrics_df = pd.DataFrame(columns=['Open', 'Close', 'Volume'])
     real_estate_metrics_df = pd.DataFrame(columns=['Open', 'Close', 'Volume'])
-
-
 
     # Populate the metrics DataFrame with historical price data
     metrics_df = pd.concat([metrics_df, pd.DataFrame({
@@ -141,8 +146,6 @@ def home():
         'Volume': real_estate_data['Volume'].values
     })])
 
-    # plt.plot(data.index, data['Close'])
-
     # Close price of the following day  (for backtesting)
     metrics_df['Tomorrow'] = metrics_df['Close'].shift(-1)
     # Prices for sectors
@@ -152,8 +155,6 @@ def home():
     financial_metrics_df['TwoWeek'] = financial_metrics_df['Close'].shift(-10)
     industrial_metrics_df['NextWeek'] = industrial_metrics_df['Close'].shift(-5)
     real_estate_metrics_df['NextWeek'] = industrial_metrics_df['Close'].shift(-5)
-    #tech_metrics_df['NextMonth'] = tech_metrics_df['Close'].shift(-23)
-
 
     #to determine if tomorrow's price (close) is greater than todays(close), (for backtesting)
     metrics_df['1DayIncrease'] = metrics_df['Tomorrow'] > metrics_df['Close']
@@ -168,8 +169,6 @@ def home():
     metrics_df['IndustrialVolume'] = industrial_metrics_df['Volume']
     metrics_df['RealEstateIncreaseWeek'] = real_estate_metrics_df['NextWeek'] > real_estate_metrics_df['Close']
     metrics_df['RealEstateVolume'] = real_estate_metrics_df['Volume']
-    #metrics_df['TechIncreaseMonth'] = tech_metrics_df['NextMonth'] > tech_metrics_df['Close']
-    # metrics_df['FinancialIncrease2Weeks'] = financial_metrics_df['TwoWeek'] > financial_metrics_df['Close']
 
     # Close price for the following week (5 business days away)
     metrics_df['NextWeek'] = metrics_df['Close'].shift(-5)
@@ -179,12 +178,8 @@ def home():
 
     #machine learning with sklearn
     #model
-
-    DayModel = RandomForestClassifier(n_estimators=100, min_samples_split=200, random_state=1)
-    WeekModel = RandomForestClassifier(n_estimators=100, min_samples_split=100, random_state=1)
-
-    # train = metrics_df.iloc[:-100]
-    # test = metrics_df.iloc[-100:]
+    DayModel = HistGradientBoostingClassifier(max_iter=200, learning_rate=0.1, random_state=1)
+    WeekModel = HistGradientBoostingClassifier(max_iter=200, learning_rate=0.1, random_state=1)
 
     predictors = ["Close", "Volume", "Open", "High", "Low", "TechIncreaseWeek", "TechVolume", "EnergyIncreaseWeek", "EnergyVolume", "FinancialIncreaseWeek", "FinancialVolume", "IndustrialVolume", "RealEstateVolume"]
 
@@ -204,6 +199,7 @@ def home():
     DayPrecision = str(DayPrecision)
     WeekPrecision = str(WeekPrecision)
 
+
     #Make predictions based on the models
 
     # 1 Day Prediction
@@ -211,11 +207,8 @@ def home():
     tomorrow_test_data = metrics_df.iloc[-1][predictors].values.reshape(1, -1)
     tomorrow_price_prediction = DayModel.predict(tomorrow_test_data)
     
-
     next_week_test_data = metrics_df.iloc[-5][predictors].values.reshape(1, -1)
     next_week_price_prediction = WeekModel.predict(next_week_test_data)
-    # print(next_week_price_prediction)
-    # print(tomorrow_price_prediction)
     
     #Prediction messages to client
     prediction_message_day = ""
@@ -239,13 +232,9 @@ def home():
         'week_precision': WeekPrecision,
         'prediction_message_day': prediction_message_day,
         'prediction_message_week': prediction_message_week,
-        # 'prediction_message': prediction_message,
-        # 'dp_to_client': dp_to_client,
     }
 
     return jsonify(context)
-
-#     return render_template('index.html', **context)
 
 if __name__ == "__main__":
     app.run()
