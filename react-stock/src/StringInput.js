@@ -56,8 +56,6 @@ function StringInput() {
           <p>Week Prediction: {outputValue.prediction_message_week}</p>
           <p>Day Precision: {outputValue.day_precision}</p>
           <p>Week Precision: {outputValue.week_precision}</p>
-          
-
         </div>
       )}
     </div>
