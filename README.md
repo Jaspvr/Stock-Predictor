@@ -21,8 +21,8 @@ Step 3:
 
 Step 4:
   Navigate to the react app and run it:
-  `cd react-stock
-  npm start`
+  `cd react-stock`
+  `npm start`
   It should now be available at http://localhost:3000/
   
 
