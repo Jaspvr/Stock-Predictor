@@ -1,6 +1,7 @@
 For this backend python code to be valid, the following must be installed ("pip install" from terminal) into the virtual environment where you are running the python:
 
-- Flask
+- flask
 - pandas
-- sklearn
+- scikit-learn
 - yfinance
+- matplotlib
