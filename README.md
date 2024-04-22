@@ -13,7 +13,7 @@ Step 1:
   Windows: `python -m venv myenv`
 
 Step 2:
-  Install all dependencies listed in dependencies.txt (flask, scikit-learn, pandas, yfinance, matplotlib):
+  Install all dependencies listed in dependencies.txt (flask, flask-cors, scikit-learn, pandas, yfinance, matplotlib):
   `pip install package-name`
 
 Step 3: 
